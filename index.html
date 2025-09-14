@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Remit - Send Food, Not Just Money</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #28a745;
+            --secondary: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+        }
+        .store-card {
+            transition: transform 0.3s;
+        }
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .category-filter {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .category-item {
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--light);
+            transition: all 0.3s;
+        }
+        .category-item.active, .category-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .step-progress {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+        .step-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ddd;
+        }
+        .step.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        .step.completed {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-utensils me-2"></i>Food Remit
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stores">Stores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <button class="btn btn-outline-light me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                        <i class="fas fa-shopping-cart me-1"></i> Cart
+                        <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Send Food, Not Just Money</h1>
+            <p class="lead mb-4">Connect with loved ones through the gift of nourishment. Select from local stores and deliver meals directly to their doorstep.</p>
+            <button class="btn btn-success btn-lg px-4 py-2" data-bs-toggle="modal" data-bs-target="#storeModal">
+                <i class="fas fa-store me-2"></i>Browse Stores
+            </button>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">How Food Remit Works</h2>
+            <div class="step-progress">
+                <div class="step completed">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="step completed">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="step active">
+                    <i class="fas fa-cart-plus"></i>
+                </div>
+                <div class="step">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="step">
+                    <i class="fas fa-gift"></i>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-1 text-primary mb-3">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <h3>1. Select a Store</h3>
+                            <p>Choose from our network of local and international grocery partners.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-1 text-primary mb-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h3>2. Add Items to Cart</h3>
+                            <p>Browse the store's inventory and select food items for your recipient.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-1 text-primary mb-3">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <h3>3. Choose Delivery</h3>
+                            <p>Select pickup or home delivery and provide recipient details.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stores Section -->
+    <section id="stores" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Our Partner Stores</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card store-card h-100">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Local Grocery Store">
+                        <div class="card-body">
+                            <h5 class="card-title">Local Grocery Store</h5>
+                            <p class="card-text">Fresh produce, pantry staples, and household essentials from your neighborhood market.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                    <span class="ms-1">4.5</span>
+                                </div>
+                                <button class="btn btn-success btn-sm" onclick="selectStore('Local Grocery Store')">
+                                    <i class="fas fa-store me-1"></i>Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card store-card h-100">
+                        <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Organic Market">
+                        <div class="card-body">
+                            <h5 class="card-title">Organic Market</h5>
+                            <p class="card-text">Certified organic fruits, vegetables, and specialty health foods.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <span class="ms-1">4.8</span>
+                                </div>
+                                <button class="btn btn-success btn-sm" onclick="selectStore('Organic Market')">
+                                    <i class="fas fa-store me-1"></i>Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card store-card h-100">
+                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="International Foods">
+                        <div class="card-body">
+                            <h5 class="card-title">International Foods</h5>
+                            <p class="card-text">Specialty ingredients and products from around the world.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="rating">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="far fa-star text-warning"></i>
+                                    <span class="ms-1">4.0</span>
+                                </div>
+                                <button class="btn btn-success btn-sm" onclick="selectStore('International Foods')">
+                                    <i class="fas fa-store me-1"></i>Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>Food Remit</h5>
+                    <p>Connecting people through the gift of food across distances.</p>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Home</a></li>
+                        <li><a href="#stores" class="text-white">Stores</a></li>
+                        <li><a href="#how-it-works" class="text-white">How It Works</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <h5>Legal</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2"></i> support@foodremit.com</li>
+                        <li><i class="fas fa-phone me-2"></i> +1 (555) 123-4567</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Food Remit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login to Food Remit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" placeholder="name@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create an Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" placeholder="John">
+                            </div>
+                            <div class="col">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="regEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="regEmail" placeholder="name@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <label for="regPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="regPassword" placeholder="Create a password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms">
+                            <label class="form-check-label" for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Store Modal -->
+    <div class="modal fade" id="storeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="storeModalTitle">Select Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="category-filter mb-4">
+                        <div class="category-item active">All</div>
+                        <div class="category-item">Fruits & Vegetables</div>
+                        <div class="category-item">Dairy & Eggs</div>
+                        <div class="category-item">Meat & Seafood</div>
+                        <div class="category-item">Bakery</div>
+                        <div class="category-item">Beverages</div>
+                        <div class="category-item">Snacks</div>
+                    </div>
+                    
+                    <div class="row" id="productList">
+                        <!-- Products will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Your Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="cartItems">
+                <!-- Cart items will be dynamically inserted here -->
+                <p class="text-muted text-center" id="emptyCartMessage">Your cart is empty</p>
+            </div>
+            <div class="mt-auto border-top pt-3">
+                <div class="d-flex justify-content-between mb-3">
+                    <strong>Total:</strong>
+                    <strong id="cartTotal">$0.00</strong>
+                </div>
+                <button class="btn btn-success w-100" id="checkoutBtn" disabled>Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dummy data for products
+        const products = {
+            'Local Grocery Store': [
+                { id: 1, name: 'Organic Apples', price: 5.99, category: 'Fruits & Vegetables', image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 2, name: 'Whole Wheat Bread', price: 3.49, category: 'Bakery', image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 3, name: 'Milk (1 Gallon)', price: 4.29, category: 'Dairy & Eggs', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 4, name: 'Chicken Breast (1lb)', price: 7.99, category: 'Meat & Seafood', image: 'https://images.unsplash.com/photo-1603052875180-e1e10e5a0b36?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 5, name: 'Bottled Water (24pk)', price: 5.49, category: 'Beverages', image: 'https://images.unsplash.com/photo-1541698441550-4a4c1c93678f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 6, name: 'Potato Chips', price: 2.99, category: 'Snacks', image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' }
+            ],
+            'Organic Market': [
+                { id: 7, name: 'Organic Bananas', price: 1.29, category: 'Fruits & Vegetables', image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 8, name: 'Free Range Eggs (12)', price: 5.99, category: 'Dairy & Eggs', image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 9, name: 'Organic Kale', price: 2.99, category: 'Fruits & Vegetables', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 10, name: 'Wild Caught Salmon', price: 12.99, category: 'Meat & Seafood', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 11, name: 'Organic Olive Oil', price: 10.49, category: 'Pantry', image: 'https://images.unsplash.com/photo-1531386450457-94d43e18f0c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' }
+            ],
+            'International Foods': [
+                { id: 12, name: 'Basmati Rice (5lb)', price: 8.99, category: 'Pantry', image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 13, name: 'Italian Pasta', price: 2.49, category: 'Pantry', image: 'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 14, name: 'Japanese Green Tea', price: 6.99, category: 'Beverages', image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 15, name: 'Mexican Salsa', price: 3.99, category: 'Pantry', image: 'https://images.unsplash.com/photo-1534482421-64566efbdafc?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' },
+                { id: 16, name: 'French Baguette', price: 2.99, category: 'Bakery', image: 'https://images.unsplash.com/photo-1586010335250-9b9d4a5ddfc0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' }
+            ]
+        };
+
+        let cart = [];
+        let currentStore = '';
+
+        // Function to select a store and show its products
+        function selectStore(storeName) {
+            currentStore = storeName;
+            const storeModal = new bootstrap.Modal(document.getElementById('storeModal'));
+            document.getElementById('storeModalTitle').textContent = storeName;
+            
+            // Clear previous products
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+            
+            // Add products to modal
+            products[storeName].forEach(product => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-3';
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <img src="${product.image}" class="card-img-top" alt="${product.name}" style="height: 150px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title">${product.name}</h6>
+                            <p class="card-text">$${product.price.toFixed(2)}</p>
+                            <button class="btn btn-success btn-sm w-100" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, '${product.image}')">
+                                <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productList.appendChild(col);
+            });
+            
+            storeModal.show();
+        }
+
+        // Function to add items to cart
+        function addToCart(id, name, price, image) {
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id,
+                    name,
+                    price,
+                    image,
+                    quantity: 1,
+                    store: currentStore
+                });
+            }
+            
+            updateCart();
+            
+            // Show the cart offcanvas
+            const cartOffcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
+            cartOffcanvas.show();
+        }
+
+        // Function to update cart display
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            
+            // Clear cart items
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                checkoutBtn.disabled = true;
+            } else {
+                emptyCartMessage.style.display = 'none';
+                checkoutBtn.disabled = false;
+                
+                let total = 0;
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover;" class="me-3">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${item.name}</h6>
+                                <small class="text-muted">$${item.price.toFixed(2)} x ${item.quantity}</small>
+                            </div>
+                            <div>
+                                <span class="fw-bold">$${itemTotal.toFixed(2)}</span>
+                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeFromCart(${item.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                cartTotal.textContent = `$${total.toFixed(2)}`;
+            }
+            
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        }
+
+        // Function to remove items from cart
+        function removeFromCart(id) {
+            const itemIndex = cart.findIndex(item => item.id === id);
+            
+            if (itemIndex !== -1) {
+                cart.splice(itemIndex, 1);
+                updateCart();
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listener to checkout button
+            document.getElementById('checkoutBtn').addEventListener('click', function() {
+                alert('Checkout functionality would be implemented here with payment processing and delivery options.');
+            });
+        });
+    </script>
+</body>
+</html>
